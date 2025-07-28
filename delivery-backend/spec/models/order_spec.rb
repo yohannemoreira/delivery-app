@@ -1,13 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Order, type: :model do
-    before(:each) do
-      @user = User.create(name: 'Maria', email: 'maria@example.com', password: 'password123')
-    end
-
-    after(:each) do
-      @user.destroy
-    end
+     let(:user) { User.create!(name: "Test User", email: "test@example.com", password: "password123") }
   it 'is valid with valid attributes' do
     order = Order.new(
       pickup_address_street: 'Main St',
@@ -28,7 +22,7 @@ RSpec.describe Order, type: :model do
       delivery_address_country: 'USA',
       description: 'Food delivery',
       estimated_value: 29.99,
-      user_id: @user.id
+      user_id: user.id
     )
     expect(order).to be_valid
   end
@@ -63,7 +57,7 @@ RSpec.describe Order, type: :model do
           delivery_address_country: 'USA',
           description: 'Food delivery',
           estimated_value: 29.99,
-          user_id: @user.id
+          user_id: user.id
         }
         attrs[attr] = nil
         order = Order.new(attrs)
@@ -103,7 +97,7 @@ RSpec.describe Order, type: :model do
           delivery_address_country: 'USA',
           description: 'Food delivery',
           estimated_value: 29.99,
-          user_id: @user.id
+          user_id: user.id
         }
         attrs[attr] = nil
         order = Order.new(attrs)

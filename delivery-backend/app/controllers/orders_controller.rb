@@ -29,6 +29,16 @@ class OrdersController < ApplicationController
         @order.destroy
     end
 
+    def user_orders
+        user = User.find_by(id: params[:user_id])
+        if user
+            @orders = user.orders
+            render :index
+        else
+            render json: { error: "User not found" }, status: :not_found
+        end
+    end
+
     private
 
     def order_params

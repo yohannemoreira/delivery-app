@@ -28,11 +28,9 @@ RSpec.describe "Users Controller", type: :request do
             get "/users/#{user.id}", headers: { "ACCEPT" => "application/json" }
         end
 
-        it "Return 200 OK" do
+        it "Return 200 OK and user details" do
             expect(response).to have_http_status(:ok)
-        end
 
-        it "Return the user details" do
             json_response = JSON.parse(response.body, symbolize_names: true)
 
             expect(json_response.keys).to include(:id, :name, :email, :created_at, :updated_at)
