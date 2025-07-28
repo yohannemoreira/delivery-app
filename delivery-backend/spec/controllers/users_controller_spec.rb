@@ -63,11 +63,12 @@ RSpec.describe "Users Controller", type: :request do
             end
 
             it "Creates a new user" do
-                json_response = JSON.parse(response.body)
-                expect(json_response['user']['id']).to be_present
-                expect(json_response['user']['name']).to eq(valid_attributes[:user][:name])
-                expect(json_response['user']['email']).to eq(valid_attributes[:user][:email])
-                expect(json_response['user']['status']).to eq('created')
+                json_response = JSON.parse(response.body, symbolize_names: true)
+                expect(json_response[:id]).to be_present
+                expect(json_response[:name]).to eq(valid_attributes[:user][:name])
+                expect(json_response[:email]).to eq(valid_attributes[:user][:email])
+                expect(json_response[:created_at]).to be_present
+                expect(json_response[:updated_at]).to be_present
             end
         end
         context "with invalid attributes" do
@@ -127,7 +128,7 @@ RSpec.describe "Users Controller", type: :request do
 
             it "Updates the username" do
                 json_response = JSON.parse(response.body, symbolize_names: true)
-                expect(json_response[:user][:name]).to eq("Updated Name")
+                expect(json_response[:name]).to eq("Updated Name")
             end
         end
 
@@ -142,7 +143,7 @@ RSpec.describe "Users Controller", type: :request do
 
             it "Updates the user's email" do
                 json_response = JSON.parse(response.body, symbolize_names: true)
-                expect(json_response[:user][:email]).to eq("updated@example.com")
+                expect(json_response[:email]).to eq("updated@example.com")
             end
         end
 
@@ -157,9 +158,9 @@ RSpec.describe "Users Controller", type: :request do
 
             it "Updates the user's password" do
                 json_response = JSON.parse(response.body, symbolize_names: true)
-                expect(json_response[:user][:id]).to eq(user.id)
-                expect(json_response[:user][:name]).to eq(user.name)
-                expect(json_response[:user][:email]).to eq(user.email)
+                expect(json_response[:id]).to eq(user.id)
+                expect(json_response[:name]).to eq(user.name)
+                expect(json_response[:email]).to eq(user.email)
             end
         end
 
