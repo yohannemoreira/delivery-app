@@ -11,5 +11,4 @@ Rails.application.routes.draw do
   resources :orders, only: [ :index, :show, :create, :update, :destroy ]
 
   get "users/:user_id/orders", to: "orders#user_orders"
-
 end
