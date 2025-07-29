@@ -47,6 +47,8 @@ group :development, :test do
 
   # Mock data for dev and test
   gem "faker"
+
+  gem "simplecov", require: false, group: :test
 end
 
 gem "annotate", "~> 2.6"

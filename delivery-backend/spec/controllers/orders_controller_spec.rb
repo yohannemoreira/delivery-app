@@ -63,6 +63,14 @@ RSpec.describe "Orders Controller", type: :request do
       }.to change(Order, :count).by(1)
       expect(response).to have_http_status(:created)
     end
+
+    it "returns 422 Unprocessable Entity for invalid attributes" do
+      invalid_attributes = valid_attributes.merge(pickup_address_street: nil)
+      post "/orders", params: { order: invalid_attributes }, headers: { "ACCEPT" => "application/json" }
+      expect(response).to have_http_status(:unprocessable_entity)
+      json_response = JSON.parse(response.body)
+      expect(json_response['pickup_address_street']).to include("A rua de retirada não pode ser vazia")
+    end
   end
 
   describe "PATCH /orders/:id" do
@@ -77,6 +85,14 @@ RSpec.describe "Orders Controller", type: :request do
       expect(response).to have_http_status(:not_found)
       json_response = JSON.parse(response.body)
       expect(json_response['error']).to eq('Order not found')
+    end
+
+    it "returns 422 Unprocessable Entity for invalid attributes" do
+      order = Order.create!(valid_attributes)
+      patch "/orders/#{order.id}", params: { order: { pickup_address_street: nil } }, headers: { "ACCEPT" => "application/json" }
+      expect(response).to have_http_status(:unprocessable_entity)
+      json_response = JSON.parse(response.body)
+      expect(json_response['pickup_address_street']).to include("A rua de retirada não pode ser vazia")
     end
   end
 

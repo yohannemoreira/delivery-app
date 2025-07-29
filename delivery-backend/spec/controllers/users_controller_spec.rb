@@ -75,7 +75,7 @@ RSpec.describe "Users Controller", type: :request do
 
                 json_response = JSON.parse(response.body)
                 expect(response).to have_http_status(:unprocessable_entity)
-                expect(json_response['name']).to include("can't be blank")
+                expect(json_response['name']).to include("O nome é obrigatório")
             end
 
             it "Returns blank fields error for email" do
@@ -83,7 +83,7 @@ RSpec.describe "Users Controller", type: :request do
 
             json_response = JSON.parse(response.body)
             expect(response).to have_http_status(:unprocessable_entity)
-            expect(json_response['email']).to include("can't be blank")
+            expect(json_response['email']).to include("O e-mail é obrigatório")
             end
 
             it "Returns blank fields error for password" do
@@ -91,7 +91,7 @@ RSpec.describe "Users Controller", type: :request do
 
                 json_response = JSON.parse(response.body)
                 expect(response).to have_http_status(:unprocessable_entity)
-                expect(json_response['password']).to include("can't be blank")
+                expect(json_response['password']).to include("A senha é obrigatória")
             end
 
             it "Returns password too short error for password" do
@@ -99,7 +99,7 @@ RSpec.describe "Users Controller", type: :request do
 
                 json_response = JSON.parse(response.body)
                 expect(response).to have_http_status(:unprocessable_entity)
-                expect(json_response['password']).to include("is too short (minimum is 8 characters)")
+                expect(json_response['password']).to include("A senha deve ter pelo menos 8 caracteres")
             end
 
             it "Returns error for incorrect password confirmation" do
@@ -205,6 +205,29 @@ RSpec.describe "Users Controller", type: :request do
                 json_response = JSON.parse(response.body)
                 expect(json_response['error']).to eq('User not found')
             end
+        end
+    end
+
+    describe "DELETE /users/:id" do
+        let(:user) { User.create!(valid_attributes[:user]) }
+
+        before do
+            delete "/users/#{user.id}", headers: { "ACCEPT" => "application/json" }
+        end
+
+        it "Return 200 OK" do
+            expect(response).to have_http_status(:ok)
+        end
+
+        it "Deletes the user" do
+            expect(User.exists?(user.id)).to be_falsey
+        end
+
+        it "Returns user not found for deleted user" do
+            get "/users/#{user.id}", headers: { "ACCEPT" => "application/json" }
+            expect(response).to have_http_status(:not_found)
+            json_response = JSON.parse(response.body)
+            expect(json_response['error']).to eq('User not found')
         end
     end
 end
