@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import UserOrders from './UserOrders';
 import { MemoryRouter } from 'react-router-dom';
 
-// Mock fetch
+
 beforeEach(() => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
@@ -64,11 +64,11 @@ describe('UserOrders', () => {
     await waitFor(() => {
         const card = screen.getByText((content) => /R\$\s?50(\.0{1,2})?/.test(content)).closest('li');
         expect(card).toBeInTheDocument();
-        // Busca dentro do card
+        
         const utils = within(card);
         expect(utils.getByText(/Item\s*1/)).toBeInTheDocument();
         expect(utils.getByText(/R\$\s?50(\.0{1,2})?/)).toBeInTheDocument();
-        // Busca o ano em qualquer elemento do card
+        
         expect(utils.getByText((content) => content.includes('2025'))).toBeInTheDocument();
         expect(utils.getByText((content) => content.includes('Coleta:'))).toBeInTheDocument();
         expect(utils.getByText((content) => content.includes('Entrega:'))).toBeInTheDocument();
@@ -101,6 +101,6 @@ describe('UserOrders', () => {
     const btn = screen.getByRole('button', { name: /voltar para início/i });
     expect(btn).toBeInTheDocument();
     fireEvent.click(btn);
-    // Não é possível testar window.location.href diretamente sem mocks
+    
   });
 });

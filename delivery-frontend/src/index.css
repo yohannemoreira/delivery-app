@@ -3,14 +3,19 @@
 @tailwind utilities;
 
 @layer base {
-  * {
+  html {
+    font-family: theme('fontFamily.sans');
+    box-sizing: border-box;
+  }
+  *, *::before, *::after {
+    box-sizing: inherit;
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-screen antialiased;
   }
 }
 
 .container {
-  @apply max-w-7xl mx-auto;
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }

@@ -32,8 +32,8 @@ const CreateOrder = () => {
     const { name, value } = e.target;
     setForm((prev) => {
       const updated = { ...prev, [name]: value };
-      // Se todos os campos obrigatórios (exceto estimated_value) estiverem preenchidos, gera valor aleatório
-      const obrigatorios = [
+      
+      const required = [
         'user_id',
         'pickup_address_street',
         'pickup_address_number',
@@ -50,9 +50,9 @@ const CreateOrder = () => {
         'delivery_address_zip',
         'delivery_address_country',
       ];
-      const allFilled = obrigatorios.every(field => updated[field] && updated[field].toString().trim() !== '');
+      const allFilled = required.every(field => updated[field] && updated[field].toString().trim() !== '');
       if (allFilled && updated.description.length > 0 && !updated.estimated_value) {
-        // Gera valor aleatório entre 10 e 200
+       
         updated.estimated_value = (Math.random() * (200 - 10) + 10).toFixed(2);
       }
       return updated;
@@ -62,7 +62,32 @@ const CreateOrder = () => {
   const handleAddItem = (e) => {
     e.preventDefault();
     if (newItem.trim() === '') return;
-    setForm((prev) => ({ ...prev, description: [...prev.description, newItem.trim()] }));
+    setForm((prev) => {
+      const updatedDescription = [...prev.description, newItem.trim()];
+      const required = [
+        'user_id',
+        'pickup_address_street',
+        'pickup_address_number',
+        'pickup_address_neighborhood',
+        'pickup_address_city',
+        'pickup_address_state',
+        'pickup_address_zip',
+        'pickup_address_country',
+        'delivery_address_street',
+        'delivery_address_number',
+        'delivery_address_neighborhood',
+        'delivery_address_city',
+        'delivery_address_state',
+        'delivery_address_zip',
+        'delivery_address_country',
+      ];
+      const allFilled = required.every(field => prev[field] && prev[field].toString().trim() !== '');
+      let estimated_value = prev.estimated_value;
+      if (allFilled && updatedDescription.length > 0 && !estimated_value) {
+        estimated_value = (Math.random() * (200 - 10) + 10).toFixed(2);
+      }
+      return { ...prev, description: updatedDescription, estimated_value };
+    });
     setNewItem('');
   };
 
@@ -72,9 +97,9 @@ const CreateOrder = () => {
 
   const validate = () => {
     const errors = {};
-    // Usuário
+    
     if (!form.user_id) errors.user_id = 'Usuário não pode ser vazio';
-    // Retirada
+    
     if (!form.pickup_address_street) errors.pickup_address_street = 'A rua de retirada não pode ser vazia';
     if (!form.pickup_address_number) errors.pickup_address_number = 'O número de retirada não pode ser vazio';
     if (!form.pickup_address_neighborhood) errors.pickup_address_neighborhood = 'O bairro de retirada não pode ser vazio';
@@ -83,7 +108,7 @@ const CreateOrder = () => {
     else if (form.pickup_address_state.length !== 2) errors.pickup_address_state = 'O estado de retirada deve ter 2 caracteres';
     if (!form.pickup_address_zip) errors.pickup_address_zip = 'O CEP de retirada não pode ser vazio';
     if (!form.pickup_address_country) errors.pickup_address_country = 'O país de retirada não pode ser vazio';
-    // Entrega
+   
     if (!form.delivery_address_street) errors.delivery_address_street = 'A rua de entrega não pode ser vazia';
     if (!form.delivery_address_number) errors.delivery_address_number = 'O número de entrega não pode ser vazio';
     if (!form.delivery_address_neighborhood) errors.delivery_address_neighborhood = 'O bairro de entrega não pode ser vazio';
@@ -92,7 +117,7 @@ const CreateOrder = () => {
     else if (form.delivery_address_state.length !== 2) errors.delivery_address_state = 'O estado de entrega deve ter 2 caracteres';
     if (!form.delivery_address_zip) errors.delivery_address_zip = 'O CEP de entrega não pode ser vazio';
     if (!form.delivery_address_country) errors.delivery_address_country = 'O país de entrega não pode ser vazio';
-    // Descrição e valor
+    
     if (!form.description || form.description.length === 0) errors.description = 'A descrição não pode ser vazia';
     if (!form.estimated_value) errors.estimated_value = 'O valor estimado não pode ser vazio';
     else if (isNaN(form.estimated_value) || Number(form.estimated_value) <= 0) errors.estimated_value = 'O valor estimado deve ser maior que 0';
