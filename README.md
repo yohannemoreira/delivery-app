@@ -20,6 +20,9 @@ Essa é uma aplicação simples que simula um sistema de entregas, que permite q
    rails server
    ```
 
+4. Para ver os usuários gerados automaticamente acesse "http://localhost:3000/users.json"
+5. Para ver os pedidos gerados automaticamente acesse "http://localhost:3000/orders.json"
+
 ## Frontend
 1. Instale as dependências:
    ```bash
