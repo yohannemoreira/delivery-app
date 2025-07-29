@@ -35,30 +35,7 @@ describe('CreateOrder', () => {
     fireEvent.click(screen.getByText('Criar Pedido'));
   });
 
-  it('gera valor estimado automaticamente ao preencher campos obrigatórios e adicionar item', () => {
-    render(<CreateOrder />);
-    fireEvent.change(screen.getByLabelText(/ID do Usuário/i), { target: { value: '1' } });
-    fireEvent.change(screen.getAllByPlaceholderText('Nome da rua')[0], { target: { value: 'Rua A' } });
-    fireEvent.change(screen.getByPlaceholderText('Adicionar item'), { target: { value: 'Pizza' } });
-    fireEvent.click(screen.getByText('Adicionar'));
-    
-    fireEvent.change(screen.getAllByPlaceholderText('123')[0], { target: { value: '10' } });
-    fireEvent.change(screen.getAllByPlaceholderText('Nome do bairro')[0], { target: { value: 'Centro' } });
-    fireEvent.change(screen.getAllByPlaceholderText('Nome da cidade')[0], { target: { value: 'SP' } });
-    fireEvent.change(screen.getAllByPlaceholderText('SP')[0], { target: { value: 'SP' } });
-    fireEvent.change(screen.getAllByPlaceholderText('12345-678')[0], { target: { value: '12345-678' } });
-    fireEvent.change(screen.getAllByPlaceholderText('Brasil')[0], { target: { value: 'Brasil' } });
-    
-    fireEvent.change(screen.getAllByPlaceholderText('Nome da rua')[1], { target: { value: 'Rua B' } });
-    fireEvent.change(screen.getAllByPlaceholderText('123')[1], { target: { value: '20' } });
-    fireEvent.change(screen.getAllByPlaceholderText('Nome do bairro')[1], { target: { value: 'Bairro' } });
-    fireEvent.change(screen.getAllByPlaceholderText('Nome da cidade')[1], { target: { value: 'SP' } });
-    fireEvent.change(screen.getAllByPlaceholderText('SP')[1], { target: { value: 'SP' } });
-    fireEvent.change(screen.getAllByPlaceholderText('12345-678')[1], { target: { value: '12345-678' } });
-    fireEvent.change(screen.getAllByPlaceholderText('Brasil')[1], { target: { value: 'Brasil' } });
-    
-    expect(screen.getByText(/R\$\s?\d+\.\d{2}/)).toBeInTheDocument();
-  });
+  
 
   it('valida todos os campos obrigatórios e exibe erros', () => {
     render(<CreateOrder />);
@@ -79,7 +56,14 @@ describe('CreateOrder', () => {
     expect(screen.getByText(/O CEP de entrega não pode ser vazio/i)).toBeInTheDocument();
     expect(screen.getByText(/O país de entrega não pode ser vazio/i)).toBeInTheDocument();
     expect(screen.getByText(/A descrição não pode ser vazia/i)).toBeInTheDocument();
-    
+    expect(screen.getByText(/O valor estimado não pode ser vazio/i)).toBeInTheDocument();
+  });
+
+  it('valida que o valor estimado é maior que zero', () => {
+    render(<CreateOrder />);
+    fireEvent.change(screen.getByLabelText(/Valor Estimado/i), { target: { value: '0' } });
+    fireEvent.click(screen.getByText('Criar Pedido'));
+    expect(screen.getByText(/O valor estimado deve ser maior que 0/i)).toBeInTheDocument();
   });
 
   it('renderiza o formulário de criação de pedido', () => {

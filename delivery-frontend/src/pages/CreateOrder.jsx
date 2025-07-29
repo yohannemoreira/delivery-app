@@ -30,64 +30,13 @@ const CreateOrder = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => {
-      const updated = { ...prev, [name]: value };
-      
-      const required = [
-        'user_id',
-        'pickup_address_street',
-        'pickup_address_number',
-        'pickup_address_neighborhood',
-        'pickup_address_city',
-        'pickup_address_state',
-        'pickup_address_zip',
-        'pickup_address_country',
-        'delivery_address_street',
-        'delivery_address_number',
-        'delivery_address_neighborhood',
-        'delivery_address_city',
-        'delivery_address_state',
-        'delivery_address_zip',
-        'delivery_address_country',
-      ];
-      const allFilled = required.every(field => updated[field] && updated[field].toString().trim() !== '');
-      if (allFilled && updated.description.length > 0 && !updated.estimated_value) {
-       
-        updated.estimated_value = (Math.random() * (200 - 10) + 10).toFixed(2);
-      }
-      return updated;
-    });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAddItem = (e) => {
     e.preventDefault();
     if (newItem.trim() === '') return;
-    setForm((prev) => {
-      const updatedDescription = [...prev.description, newItem.trim()];
-      const required = [
-        'user_id',
-        'pickup_address_street',
-        'pickup_address_number',
-        'pickup_address_neighborhood',
-        'pickup_address_city',
-        'pickup_address_state',
-        'pickup_address_zip',
-        'pickup_address_country',
-        'delivery_address_street',
-        'delivery_address_number',
-        'delivery_address_neighborhood',
-        'delivery_address_city',
-        'delivery_address_state',
-        'delivery_address_zip',
-        'delivery_address_country',
-      ];
-      const allFilled = required.every(field => prev[field] && prev[field].toString().trim() !== '');
-      let estimated_value = prev.estimated_value;
-      if (allFilled && updatedDescription.length > 0 && !estimated_value) {
-        estimated_value = (Math.random() * (200 - 10) + 10).toFixed(2);
-      }
-      return { ...prev, description: updatedDescription, estimated_value };
-    });
+    setForm((prev) => ({ ...prev, description: [...prev.description, newItem.trim()] }));
     setNewItem('');
   };
 
@@ -119,8 +68,11 @@ const CreateOrder = () => {
     if (!form.delivery_address_country) errors.delivery_address_country = 'O país de entrega não pode ser vazio';
     
     if (!form.description || form.description.length === 0) errors.description = 'A descrição não pode ser vazia';
-    if (!form.estimated_value) errors.estimated_value = 'O valor estimado não pode ser vazio';
-    else if (isNaN(form.estimated_value) || Number(form.estimated_value) <= 0) errors.estimated_value = 'O valor estimado deve ser maior que 0';
+    if (!form.estimated_value || form.estimated_value.toString().trim() === '') {
+      errors.estimated_value = 'O valor estimado não pode ser vazio';
+    } else if (isNaN(form.estimated_value) || Number(form.estimated_value) <= 0) {
+      errors.estimated_value = 'O valor estimado deve ser maior que 0';
+    }
     return errors;
   };
 
@@ -194,7 +146,7 @@ const CreateOrder = () => {
               Endereço de Coleta
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* ...campos de coleta... */}
+              
               <div>
                 <label htmlFor="pickup_address_street" className="block text-sm font-medium text-gray-700">Rua *</label>
                 <input id="pickup_address_street" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500" type="text" name="pickup_address_street" placeholder="Nome da rua" value={form.pickup_address_street} onChange={handleChange} />
@@ -236,7 +188,7 @@ const CreateOrder = () => {
               </div>
             </div>
           </div>
-          {/* Endereço de Entrega */}
+          
           <div className="bg-gray-100 rounded-lg p-6 mb-2 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
               Endereço de Entrega
@@ -283,7 +235,7 @@ const CreateOrder = () => {
               </div>
             </div>
           </div>
-          {/* Dados do Usuário e Descrição */}
+          
           <div className="bg-gray-100 rounded-lg p-6 mb-2 shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -319,14 +271,22 @@ const CreateOrder = () => {
               </div>
             </div>
           </div>
-          {/* Valor Estimado */}
           <div className="bg-gray-100 rounded-lg p-6 mb-2 shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Valor Estimado *</label>
-                <div className="mt-1 block w-full rounded-md border border-green-300 bg-green-50 px-3 py-2 text-green-700 font-bold">
-                  {form.estimated_value ? `R$ ${form.estimated_value}` : <span className="text-gray-400">Preencha todos os campos obrigatórios</span>}
-                </div>
+                <label htmlFor="estimated_value" className="block text-sm font-medium text-gray-700">Valor Estimado *</label>
+                <input
+                  id="estimated_value"
+                  name="estimated_value"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="mt-1 block w-full rounded-md border-green-300 bg-green-50 px-3 py-2 text-green-700 font-bold focus:border-green-500 focus:ring-green-500"
+                  placeholder="Digite o valor estimado"
+                  value={form.estimated_value}
+                  onChange={handleChange}
+                />
+                {fieldErrors.estimated_value && <span className="text-xs text-red-500">{fieldErrors.estimated_value}</span>}
               </div>
             </div>
           </div>
