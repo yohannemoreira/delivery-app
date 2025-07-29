@@ -108,7 +108,6 @@ const CreateOrder = () => {
     if (Object.keys(errors).length > 0) return;
     setLoading(true);
     try {
-      // Monta o objeto com os tipos corretos
       const payload = {
         ...form,
         user_id: form.user_id ? Number(form.user_id) : '',

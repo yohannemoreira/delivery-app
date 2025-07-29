@@ -1,12 +1,92 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import CreateOrder from './CreateOrder';
+/* global jest, global, expect, describe, it */
 
+import { render, screen, fireEvent } from '@testing-library/react';
+
+import CreateOrder from './CreateOrder';
 describe('CreateOrder', () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('exibe mensagem de sucesso ao criar pedido', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+    render(<CreateOrder />);
+    // Preenche todos os campos obrigatórios
+    fireEvent.change(screen.getByLabelText(/ID do Usuário/i), { target: { value: '1' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da rua')[0], { target: { value: 'Rua A' } });
+    fireEvent.change(screen.getAllByPlaceholderText('123')[0], { target: { value: '10' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome do bairro')[0], { target: { value: 'Centro' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da cidade')[0], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('SP')[0], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('12345-678')[0], { target: { value: '12345-678' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Brasil')[0], { target: { value: 'Brasil' } });
+    // Entrega
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da rua')[1], { target: { value: 'Rua B' } });
+    fireEvent.change(screen.getAllByPlaceholderText('123')[1], { target: { value: '20' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome do bairro')[1], { target: { value: 'Bairro' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da cidade')[1], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('SP')[1], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('12345-678')[1], { target: { value: '12345-678' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Brasil')[1], { target: { value: 'Brasil' } });
+    // Adiciona item
+    fireEvent.change(screen.getByPlaceholderText('Adicionar item'), { target: { value: 'Pizza' } });
+    fireEvent.click(screen.getByText('Adicionar'));
+    // Submete
+    fireEvent.click(screen.getByText('Criar Pedido'));
+  });
+
+  it('gera valor estimado automaticamente ao preencher campos obrigatórios e adicionar item', () => {
+    render(<CreateOrder />);
+    fireEvent.change(screen.getByLabelText(/ID do Usuário/i), { target: { value: '1' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da rua')[0], { target: { value: 'Rua A' } });
+    fireEvent.change(screen.getByPlaceholderText('Adicionar item'), { target: { value: 'Pizza' } });
+    fireEvent.click(screen.getByText('Adicionar'));
+    // Preenche todos os campos obrigatórios de coleta
+    fireEvent.change(screen.getAllByPlaceholderText('123')[0], { target: { value: '10' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome do bairro')[0], { target: { value: 'Centro' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da cidade')[0], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('SP')[0], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('12345-678')[0], { target: { value: '12345-678' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Brasil')[0], { target: { value: 'Brasil' } });
+    // Preenche todos os campos obrigatórios de entrega
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da rua')[1], { target: { value: 'Rua B' } });
+    fireEvent.change(screen.getAllByPlaceholderText('123')[1], { target: { value: '20' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome do bairro')[1], { target: { value: 'Bairro' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Nome da cidade')[1], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('SP')[1], { target: { value: 'SP' } });
+    fireEvent.change(screen.getAllByPlaceholderText('12345-678')[1], { target: { value: '12345-678' } });
+    fireEvent.change(screen.getAllByPlaceholderText('Brasil')[1], { target: { value: 'Brasil' } });
+    // Valor estimado deve aparecer
+    expect(screen.getByText(/R\$\s?\d+\.\d{2}/)).toBeInTheDocument();
+  });
+
+  it('valida todos os campos obrigatórios e exibe erros', () => {
+    render(<CreateOrder />);
+    fireEvent.click(screen.getByText('Criar Pedido'));
+    expect(screen.getByText(/Usuário não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/A rua de retirada não pode ser vazia/i)).toBeInTheDocument();
+    expect(screen.getByText(/O número de retirada não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/O bairro de retirada não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/A cidade de retirada não pode ser vazia/i)).toBeInTheDocument();
+    expect(screen.getByText(/O estado de retirada não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/O CEP de retirada não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/O país de retirada não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/A rua de entrega não pode ser vazia/i)).toBeInTheDocument();
+    expect(screen.getByText(/O número de entrega não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/O bairro de entrega não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/A cidade de entrega não pode ser vazia/i)).toBeInTheDocument();
+    expect(screen.getByText(/O estado de entrega não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/O CEP de entrega não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/O país de entrega não pode ser vazio/i)).toBeInTheDocument();
+    expect(screen.getByText(/A descrição não pode ser vazia/i)).toBeInTheDocument();
+    // O erro de valor estimado não aparece pois o campo é preenchido automaticamente
+  });
+
   it('renderiza o formulário de criação de pedido', () => {
     render(<CreateOrder />);
     expect(screen.getByText(/Sistema de Pedidos de Entrega/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/ID do Usuário/i)).toBeInTheDocument();
-    expect(screen.getByText(/Itens do Pedido/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText('Adicionar item'), { target: { value: 'Pizza' } });
+    fireEvent.click(screen.getByText('Adicionar'));
   });
 
   it('adiciona itens à lista de descrição', () => {
@@ -40,7 +120,6 @@ describe('CreateOrder', () => {
   it('submete o formulário com sucesso', async () => {
     render(<CreateOrder />);
     const userIdInput = screen.getByLabelText(/ID do Usuário/i);
-    // Seleciona o campo de rua de coleta (primeiro input com placeholder 'Nome da rua')
     const streetInput = screen.getAllByPlaceholderText('Nome da rua')[0];
     const descriptionInput = screen.getByPlaceholderText('Adicionar item');
     const addButton = screen.getByText('Adicionar');

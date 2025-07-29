@@ -1,29 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const UserOrders = () => {
-  const [userId, setUserId] = useState('');
+const UserOrders = ({ userId: userIdProp }) => {
+  const [userId, setUserId] = useState(userIdProp || '');
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const fetchOrders = async (e) => {
-    e.preventDefault();
+  const fetchOrders = useCallback(async (eOrId) => {
+    let id = userId;
+    if (typeof eOrId === 'string' || typeof eOrId === 'number') {
+      id = eOrId;
+    } else if (eOrId && eOrId.preventDefault) {
+      eOrId.preventDefault();
+    }
+    if (!id) return;
     setLoading(true);
     setError('');
     setOrders([]);
     try {
-      const response = await fetch(`http://localhost:3000/users/${userId}/orders`);
+      const response = await fetch(`http://localhost:3000/users/${id}/orders`);
       if (!response.ok) throw new Error('Erro ao buscar pedidos');
       const data = await response.json();
-      setOrders(data.orders || []);
+      setOrders(Array.isArray(data) ? data : (data.orders || []));
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userIdProp) {
+      setUserId(userIdProp);
+      fetchOrders(userIdProp);
+    }
+  }, [userIdProp, fetchOrders]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-8">
@@ -53,7 +66,7 @@ const UserOrders = () => {
             <li key={order.id} className="border rounded-lg p-4 bg-gray-50">
               <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-2">
                 <span className="font-bold text-lg text-gray-700">{order.description}</span>
-                <span className="text-green-600 font-semibold">R$ {order.estimated_value}</span>
+                <span className="text-green-600 font-semibold">R$ {Number(order.estimated_value).toFixed(2)}</span>
               </div>
               <div className="text-sm text-gray-500 mb-2">{order.created_at ? new Date(order.created_at).toLocaleString('pt-BR') : '-'}</div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
